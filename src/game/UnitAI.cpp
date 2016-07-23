@@ -28,6 +28,7 @@
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "CreatureAIImpl.h"
+bool TopAggroFlaggedUnattackable;
 
 void UnitAI::AttackStart(Unit *victim)
 {
@@ -52,26 +53,28 @@ void UnitAI::DoMeleeAttackIfReady()
         if(((Creature*)me)->GetSelection() != me->getVictimGUID() && !((Creature*)me)->hasIgnoreVictimSelection())
             ((Creature*)me)->SetSelection(me->getVictimGUID());
     }
+			
+	FlagInvalidTargetsUnattackable();
 
-    //Make sure our attack is ready and we aren't currently casting before checking distance
-    if (me->isAttackReady())
-    {
-        //If we are within range melee the target
-        if (me->IsWithinMeleeRange(me->getVictim()))
-        {
-            me->AttackerStateUpdate(me->getVictim());
-            me->resetAttackTimer();
-        }
-    }
-    if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK))
-    {
-        //If we are within range melee the target
-        if (me->IsWithinMeleeRange(me->getVictim()))
-        {
-            me->AttackerStateUpdate(me->getVictim(), OFF_ATTACK);
-            me->resetAttackTimer(OFF_ATTACK);
-        }
-    }
+	//Make sure our attack is ready and we aren't currently casting before checking distance
+	if (me->isAttackReady())
+	{		
+		//If we are within range melee the target
+		if (me->IsWithinMeleeRange(me->getVictim()))
+		{
+			me->AttackerStateUpdate(me->getVictim());
+			me->resetAttackTimer();
+		}
+	}
+	if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK))
+	{	
+		//If we are within range melee the target
+		if (me->IsWithinMeleeRange(me->getVictim()))
+		{		
+			me->AttackerStateUpdate(me->getVictim(), OFF_ATTACK);
+			me->resetAttackTimer(OFF_ATTACK);
+		}
+	}
 }
 
 bool UnitAI::DoSpellAttackIfReady(uint32 spell)
@@ -475,7 +478,6 @@ bool UnitAI::HasEventAISummonedUnits()
         return false;
 
     bool alive = false;
-
     for (std::list<uint64>::iterator itr = eventAISummonedList.begin(); itr != eventAISummonedList.end();)
     {
         std::list<uint64>::iterator tmpItr = itr;
@@ -490,4 +492,105 @@ bool UnitAI::HasEventAISummonedUnits()
     }
 
     return alive;
+}
+//Checks the supplied Target for auras from spells that should trigger an aggro loss
+bool UnitAI::ShouldBreakAggro(Unit* Target) {
+	uint32 spellArray[] = {
+		//Gouge
+		1776, 1777, 3232, 8629, 11285, 11286, 12540, 13579,13741,13792,13793,23048, 24698,28456,29425,34940,36862, 38764,38863,
+		//Iceblock
+		45438,
+		//Divine Shield
+		642,1020,
+		//Divine Protection
+		498, 5573,
+		//Polymorph
+		118, 851, 12824, 12825, 12826, 13323, 14621, 15334, 27760, 28271, 28272, 28285, 29124, 29848, 30838, 33173, 36840,38245, 38896, 41334, 43309, 46280,
+		//Dragon's Breath
+		29964, 29965, 31661, 33041, 33042, 33043, 35250, 37289,
+		//Bellowing Roar | if all target are feared, main aggro should retain aggro
+		18431,22686,36922,39427,40636,44863,
+		//Fear
+		5782, 6213, 6215, 12096, 12542, 22678, 26070, 26580, 26661, 27641, 27990, 29168, 29321, 30002, 30530, 30584, 30615, 31358, 31970, 32241, 33547, 33924,
+		34259, 38154, 38595, 38660, 39119, 39176, 39210, 39415, 41150,
+		//Terrifying Howl | same as bellowing roar
+		8715, 30752,
+		//Howl of Terror
+		5484, 17928, 39048,
+		//Seduction
+		6358, 6359, 20407, 29490, 30850, 31865, 36241,		
+		//Intimidating Shout
+		5246, 20511,
+		//Death Coil
+		6789, 17925, 17926, 27223, 28412, 30500, 30741, 32709, 33130, 34437, 35954, 38065, 39661, 41070, 44142, 46283,
+		//Banish
+		710, 8994, 18647, 27565, 30231, 31797, 35182, 37527, 37546, 37833, 38009, 38791, 39622, 39674, 40370, 42354, 44765, 44836,
+		//Freezing Trap (Effect)
+		3355, 14308, 14309, 31932, 43448,
+		//Scatter Shot
+		19503, 23601, 36732, 37506, 46681, 50733,
+		//Scare Beast,
+		1513, 14326, 14327,
+		//Sap
+		2070, 6770, 11297, 30980,
+		//Cyclone
+		33786,
+		//Hibernate
+		2637, 18657, 18658,
+		//Psychic Scream
+		8122, 8124, 10888, 10890, 13704, 15398, 22884, 26042, 27610, 34322, 43432,
+		//Shackle
+		9484, 9485, 10955, 11444, 38051, 38505, 40135		
+	};
+	
+	uint32 size = (sizeof(spellArray) / sizeof(*spellArray));
+	for (int i = 0; i < (size); ++i) {
+
+		if (Target->HasAura(spellArray[i]) == true) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+//Checks all victims in the current threat list for CC's / Buffs that should cause an aggro loss / make them unattackable
+void UnitAI::FlagInvalidTargetsUnattackable() {						
+	Unit* tmpUnit = NULL;
+	int i = 0;
+	bool flagTopAggro = false;	
+
+	std::list<Unit*> targetList;
+	SelectUnitList(targetList, 0, SELECT_TARGET_TOPAGGRO, 41, false);
+	Unit* topAggro = SelectUnit(SELECT_TARGET_TOPAGGRO, 0, 41, false);
+
+	if (topAggro->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE)) {
+		topAggro->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+	}
+
+	if (targetList.size() > 1) {
+		for (std::list<Unit*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+		{
+			tmpUnit = *itr;						
+			//probably need to implement check that the flag was set by this function
+			if (ShouldBreakAggro(tmpUnit) == true || me->GetExactDistance2d(tmpUnit->GetPositionX(), tmpUnit->GetPositionY()) >= 41)
+			{				
+				tmpUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				++i;
+			}
+			else {
+				if (tmpUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE)) {
+					tmpUnit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				}				
+			}			
+		
+			//All targets in thread list excluding the top aggro target have been cc'd (e.g. AoE fear) - Top aggro target should retain aggro.
+			//Also avoids reset due to all targets being flagged non attackable
+			if (i == targetList.size()) {			
+				if (topAggro->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE)) {
+					topAggro->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+				}
+			}			
+		}			
+	}
 }
