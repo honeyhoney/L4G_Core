@@ -53,7 +53,7 @@ void UnitAI::DoMeleeAttackIfReady()
         if(((Creature*)me)->GetSelection() != me->getVictimGUID() && !((Creature*)me)->hasIgnoreVictimSelection())
             ((Creature*)me)->SetSelection(me->getVictimGUID());
     }
-			
+				
 	FlagInvalidTargetsUnattackable();
 
 	//Make sure our attack is ready and we aren't currently casting before checking distance
@@ -561,18 +561,23 @@ void UnitAI::FlagInvalidTargetsUnattackable() {
 	bool flagTopAggro = false;	
 
 	std::list<Unit*> targetList;
-	SelectUnitList(targetList, 0, SELECT_TARGET_TOPAGGRO, 41, false);
-	Unit* topAggro = SelectUnit(SELECT_TARGET_TOPAGGRO, 0, 41, false);
 
+	//Nothing relevant happens for a melee mob above 41 yards distance
+	//Select targets only in this range to avoid reset issues and prohibit abuse by max ranging mobs
+	SelectUnitList(targetList, 0, SELECT_TARGET_TOPAGGRO, 41, false);
+	Unit* topAggro = SelectUnit(SELECT_TARGET_TOPAGGRO, 0);
+
+	//Make sure that the top aggro doesn't have the flag from the last call of the function to avoid mob reset
 	if (topAggro->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE)) {
 		topAggro->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 	}
 
+	//Logic only applies if there are more than 2 targets
 	if (targetList.size() > 1) {
 		for (std::list<Unit*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
 		{
 			tmpUnit = *itr;						
-			//probably need to implement check that the flag was set by this function
+			//If our current target is affected by a relevant spell or above 41 yards distance, flag it.
 			if (ShouldBreakAggro(tmpUnit) == true || me->GetExactDistance2d(tmpUnit->GetPositionX(), tmpUnit->GetPositionY()) >= 41)
 			{				
 				tmpUnit->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -584,7 +589,7 @@ void UnitAI::FlagInvalidTargetsUnattackable() {
 				}				
 			}			
 		
-			//All targets in thread list excluding the top aggro target have been cc'd (e.g. AoE fear) - Top aggro target should retain aggro.
+			//All targets in thread list excluding the top aggro target have been affected by relevant spells (e.g. AoE fear) - Top aggro target should retain aggro.
 			//Also avoids reset due to all targets being flagged non attackable
 			if (i == targetList.size()) {			
 				if (topAggro->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE)) {
