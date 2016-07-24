@@ -562,6 +562,14 @@ void UnitAI::FlagInvalidTargetsUnattackable() {
 
 	std::list<Unit*> targetList;
 
+	std::cout << me->GetOwnerGUID() << std::endl;
+	std::cout << me->GetCharmerGUID() << std::endl;
+
+	//Disable for pets (for now)
+	if (me->GetOwnerGUID() != 0 || me->GetCharmerGUID() != 0) {
+		return;
+	}
+
 	//Nothing relevant happens for a melee mob above 41 yards distance
 	//Select targets only in this range to avoid reset issues and prohibit abuse by max ranging mobs
 	SelectUnitList(targetList, 0, SELECT_TARGET_TOPAGGRO, 41, false);
