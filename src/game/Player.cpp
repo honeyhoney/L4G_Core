@@ -21168,11 +21168,23 @@ void Player::PushSixty()
     learnSpell(34093); //riding skill of 300
 	ModifyMoney(100000000);
 
+	//Leatherworking
 	learnSpell(28029);
 	SetSkill(333, 375, 375);
 
+	//Enchanting
 	learnSpell(32549);
 	SetSkill(165, 375, 375);
+
+	//Alchemy
+	learnSpell(28596);
+	SetSkill(171, 375, 375);
+
+	//Engineering
+	learnSpell(30350);
+	//Goblin Engineering
+	learnSpell(20222);
+	SetSkill(202, 375, 375);
 
 	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(946), 42000);
 	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(989), 42000);
