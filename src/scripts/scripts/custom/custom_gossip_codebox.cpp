@@ -118,6 +118,13 @@ bool GossipSelect_custom_gossip_codebox(Player* Player, Creature* Creature, uint
             break;
        case GOSSIP_ACTION_INFO_DEF + 112:
             Player->PushSixty();
+
+			Player->learnSpell(28029);
+			Player->SetSkill(165, 375, 375);
+
+			Player->learnSpell(32549);
+			Player->SetSkill(165, 375, 375);
+
             Player->ADD_GOSSIP_ITEM(0, "continue", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2112);
             Player->PlayerTalkClass->SendGossipMenu(30011, Creature->GetGUID());
             break;
