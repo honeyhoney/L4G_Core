@@ -21166,7 +21166,14 @@ void Player::PushSixty()
 {
     GiveLevel(70);
     learnSpell(34093); //riding skill of 300
-	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(529), 6999); // cenarius	
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(946), 41000);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(989), 41000);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(942), 41000);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(1011), 41000);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(932), 41000);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(934), 41000);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(967), 41000);
+
 
 	switch (GetTeam()) {
 		case ALLIANCE:
