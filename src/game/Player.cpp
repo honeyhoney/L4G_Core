@@ -21167,7 +21167,7 @@ void Player::Push()
 void Player::PushSixty()
 {
     GiveLevel(70);
-    learnSpell(34092); //riding skill of 225
+    learnSpell(34093); //riding skill of 225
 	switch (GetTeam()) {
 		case ALLIANCE:
 			if (!HasItemCount(25527, 1, true))  //Mount
