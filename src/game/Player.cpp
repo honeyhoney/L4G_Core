@@ -22004,7 +22004,7 @@ void Player::FinishPushSixty()
     m_homebindMapId = 530;
     m_homebindZoneId = 3521;
     m_homebindX = 804.540283f;
-    m_homebindY = -6865.130371f;
+    m_homebindY = 6865.130371f;
     m_homebindZ = -66.961578f;
 
     WorldPacket data(SMSG_BINDPOINTUPDATE, (4 + 4 + 4 + 4 + 4));
