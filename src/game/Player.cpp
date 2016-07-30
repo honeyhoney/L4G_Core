@@ -21146,11 +21146,9 @@ uint8 Player::GetValidForPush()
 
 void Player::Push()
 {
-    //GiveLevel(60);
-    //learnSpell(33392); //riding skill of 150
-    //SaveToDB();
-	GiveLevel(70);
-	learnSpell(34092); //riding skill of 225
+    GiveLevel(60);
+    learnSpell(33392); //riding skill of 150
+    SaveToDB();	
 	switch (GetTeam()) {
 	case ALLIANCE:
 		if (!HasItemCount(25527, 1, true))  //Mount
@@ -21168,6 +21166,52 @@ void Player::PushSixty()
 {
     GiveLevel(70);
     learnSpell(34093); //riding skill of 300
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(529), 6999); // cenarius
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(10212), 4999); //shatar
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(87), 6999); //under city
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(21), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(910), 6999); //45
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(609), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(942), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(909), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(577), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(729), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(369), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(92), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(946), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(749), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(989), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(978), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(1011), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(93), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(1015), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(1038), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(470), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(349), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(1031), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(809), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(890), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(970), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(730), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(70), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(932), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(933), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(510), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(509), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(941), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(990), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(934), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(935), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(967), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(59), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(947), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(576), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(922), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(889), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(471), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(589), 6999);
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(270), 6999);	
+
 	switch (GetTeam()) {
 		case ALLIANCE:
 			if (!HasItemCount(25527, 1, true))  //Mount

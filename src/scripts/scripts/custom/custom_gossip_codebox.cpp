@@ -841,13 +841,17 @@ bool GossipSelect_custom_gossip_codebox(Player* Player, Creature* Creature, uint
             Player->PlayerTalkClass->SendGossipMenu(30012, Creature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF + 113:
-        {
+        {			
             // WARRIOR - DD -fertig
             //               Helm,   Kette, Schulter, 0, Brust, Gurt,  Beine, F??e,  Arme,  H?nde, Ring,  Ring2, Schmuck, Schmuck, Umhang, Waffe, 2HWaffe, Fernk
-            uint16 items[] = {16731, 22340, 16733,    0, 16730, 16736, 16732, 16734, 16735, 16737, 18701, 13098, 7734,    22321,   13397,  22404, 14487,   18680};
+            //uint16 items[] = {16731, 22340, 16733,    0, 16730, 16736, 16732, 16734, 16735, 16737, 18701, 13098, 7734,    22321,   13397,  22404, 14487,   18680};
+			uint16 items[] = { 29021, 29381, 30740, 0, 30730, 28779, 29022, 28608, 28795, 28824, 30738, 28757, 28830, 28034, 24259, 0, 0, 30724 };
             Player->EquipForPushSixty(items);
             if (!Player->HasItemCount(28053, 200, true))
                 Player->AddItem(28053, 200);
+
+			Player->AddItem(28767, 2);
+			Player->AddItem(28773, 1);
             Player->ADD_GOSSIP_ITEM(0, "Take me to class trainer", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 140);
             Player->PlayerTalkClass->SendGossipMenu(30013, Creature->GetGUID());
             break;
