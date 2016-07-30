@@ -185,7 +185,9 @@ bool GossipSelect_custom_gossip_codebox(Player* Player, Creature* Creature, uint
         case GOSSIP_ACTION_INFO_DEF + 14:
         {
             // WARRIOR - TANK -ü
-            uint16 items[] = {32871,29794,30291,0,30270,30380,25979,32866,30225,30264,30006,31528,28042,31617,29777,30278,25624,25971};
+            //uint16 items[] = {32871,29794,30291,0,30270,30380,25979,32866,30225,30264,30006,31528,28042,31617,29777,30278,25624,25971};
+			uint16 items[] = { 29011, 28516, 29016, 0, 29012, 28566, 28621, 28747, 23538, 30741, 29279, 28675, 23836, 23836, 28660, 29362, 28825, 28826 };
+
 			Player->EquipForPush(items);
 			if (!Player->HasItemCount(28056, 200, true))
 				Player->AddItem(28056, 200);

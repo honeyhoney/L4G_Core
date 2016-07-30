@@ -21153,8 +21153,18 @@ void Player::Push()
 
 void Player::PushSixty()
 {
-    GiveLevel(60);
-    learnSpell(33389); //riding skill of 75
+    GiveLevel(70);
+    learnSpell(34092); //riding skill of 225
+	switch (GetTeam()) {
+		case ALLIANCE:
+			if (!HasItemCount(25527, 1, true))  //Mount
+				AddItem(25527, 1);
+			break;
+		case HORDE:
+			if (!HasItemCount(25477, 1, true))  //Mount
+				AddItem(25477, 1);
+			break;
+	}
     SaveToDB();
 }
 
