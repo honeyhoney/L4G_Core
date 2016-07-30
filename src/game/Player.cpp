@@ -21186,6 +21186,14 @@ void Player::PushSixty()
 	learnSpell(20222);
 	SetSkill(202, 375, 375);
 
+	//Tailoring
+	learnSpell(12180);
+	//Specializations
+	learnSpell(26797);
+	learnSpell(26798);
+	learnSpell(26801);
+	SetSkill(197, 375, 375);
+
 	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(946), 42000);
 	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(989), 42000);
 	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(942), 42000);
@@ -21993,11 +22001,11 @@ void Player::FinishPush()
 void Player::FinishPushSixty()
 {
     RealmDataDatabase.PExecute("UPDATE character_homebind SET map='%u', zone='%u', position_x='%f', position_y='%f', position_z='%f' WHERE guid='%u'", 0, 4, -11789.0f, -3171.169922f, -29.0f, GUID_LOPART(GetGUID()));
-    m_homebindMapId = 0;
-    m_homebindZoneId = 4;
-    m_homebindX = -11778.870117f;
-    m_homebindY = -3200.828369f;
-    m_homebindZ = -26.389161f;
+    m_homebindMapId = 530;
+    m_homebindZoneId = 3521;
+    m_homebindX = 804.540283f;
+    m_homebindY = -6865.130371f;
+    m_homebindZ = -66.961578f;
 
     WorldPacket data(SMSG_BINDPOINTUPDATE, (4 + 4 + 4 + 4 + 4));
     data << float(m_homebindX);
