@@ -117,14 +117,7 @@ bool GossipSelect_custom_gossip_codebox(Player* Player, Creature* Creature, uint
             Player->PlayerTalkClass->SendGossipMenu(30011, Creature->GetGUID());
             break;
        case GOSSIP_ACTION_INFO_DEF + 112:
-            Player->PushSixty();
-
-			Player->learnSpell(28029);
-			Player->SetSkill(165, 375, 375);
-
-			Player->learnSpell(32549);
-			Player->SetSkill(165, 375, 375);
-
+            Player->PushSixty();			
             Player->ADD_GOSSIP_ITEM(0, "continue", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2112);
             Player->PlayerTalkClass->SendGossipMenu(30011, Creature->GetGUID());
             break;
@@ -183,7 +176,7 @@ bool GossipSelect_custom_gossip_codebox(Player* Player, Creature* Creature, uint
 			if (!Player->HasItemCount(28056, 200, true))
 				Player->AddItem(28056, 200);
             Player->AddItem(30364, 1);
-            Player->AddItem(31423, 1);
+            Player->AddItem(28657, 1);
             Player->AddItem(31701, 1);
             Player->ADD_GOSSIP_ITEM(0, "Take me to class trainer", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 31);
             Player->PlayerTalkClass->SendGossipMenu(30013, Creature->GetGUID());
@@ -856,9 +849,10 @@ bool GossipSelect_custom_gossip_codebox(Player* Player, Creature* Creature, uint
             Player->EquipForPushSixty(items);
             if (!Player->HasItemCount(28053, 200, true))
                 Player->AddItem(28053, 200);
-
-			Player->AddItem(28767, 2);
-			Player->AddItem(28773, 1);
+			
+			Player->AddItem(28438, 2);
+			Player->AddItem(28435, 1);
+			Player->AddItem(28429, 1);
             Player->ADD_GOSSIP_ITEM(0, "Take me to class trainer", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 140);
             Player->PlayerTalkClass->SendGossipMenu(30013, Creature->GetGUID());
             break;
@@ -961,6 +955,7 @@ bool GossipSelect_custom_gossip_codebox(Player* Player, Creature* Creature, uint
 			uint16 items[] = { 29040, 29381, 29043, 0, 30730, 28828, 28741, 28545, 28514, 30644, 30738, 28757, 28830, 29383, 24259, 28767, 28767, 27815 };
             Player->EquipForPushSixty(items);
             Player->AddItem(14487, 1);
+			Player->AddItem(28438, 2);
             Player->ADD_GOSSIP_ITEM(0, "Take me to class trainer", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 140);
             Player->PlayerTalkClass->SendGossipMenu(30013, Creature->GetGUID());
             break;

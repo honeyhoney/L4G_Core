@@ -21194,6 +21194,16 @@ void Player::PushSixty()
 	learnSpell(26801);
 	SetSkill(197, 375, 375);
 
+	//Blacksmithing
+	learnSpell(29844);
+	//Specializations
+	learnSpell(9787);
+	learnSpell(17039);
+	learnSpell(17040);
+	learnSpell(17041);
+
+	SetSkill(164, 375, 375);
+
 	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(946), 42000);
 	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(989), 42000);
 	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(942), 42000);
