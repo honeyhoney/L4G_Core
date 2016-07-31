@@ -952,10 +952,9 @@ bool GossipSelect_custom_gossip_codebox(Player* Player, Creature* Creature, uint
         {
             // SHAMANE - VERST?RKER - fertig
             //uint16 items[] = {16667, 22340, 16669, 0, 16666, 16673, 16668, 16670, 16671, 16672, 18701, 13098, 7734, 22321, 13397, 22404, 0, 22395};
-			uint16 items[] = { 29040, 29381, 29043, 0, 30730, 28828, 28741, 28545, 28514, 30644, 30738, 28757, 28830, 29383, 24259, 28767, 28767, 27815 };
+			uint16 items[] = { 29040, 29381, 29043, 0, 30730, 28828, 28741, 28545, 28514, 30644, 30738, 28757, 28830, 29383, 24259, 28438, 28438, 27815 };
             Player->EquipForPushSixty(items);
-            Player->AddItem(14487, 1);
-			Player->AddItem(28438, 2);
+            		
             Player->ADD_GOSSIP_ITEM(0, "Take me to class trainer", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 140);
             Player->PlayerTalkClass->SendGossipMenu(30013, Creature->GetGUID());
             break;
