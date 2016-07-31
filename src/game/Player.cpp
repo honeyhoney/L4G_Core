@@ -21212,8 +21212,8 @@ void Player::PushSixty()
 	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(967), 42000);
 	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(609), 42000);
 	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(947), 42000);
-	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(935), 42000);
-
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(935), 42000); 
+	m_reputationMgr.SetReputation(sFactionStore.LookupEntry(1038), 42000);
 	//cenarion, consturtium, thrallmar, sha'tar
 
 	switch (GetTeam()) {
