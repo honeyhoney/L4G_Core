@@ -852,7 +852,7 @@ bool GossipSelect_custom_gossip_codebox(Player* Player, Creature* Creature, uint
 			
 			Player->AddItem(28438, 2);
 			Player->AddItem(28435, 1);
-			Player->AddItem(28429, 1);
+			
             Player->ADD_GOSSIP_ITEM(0, "Take me to class trainer", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 140);
             Player->PlayerTalkClass->SendGossipMenu(30013, Creature->GetGUID());
             break;
