@@ -109,6 +109,12 @@ class LOOKING4GROUP_EXPORT UnitAI
         Unit* SelectUnit(SelectAggroTarget target, uint32 position = 0, float max_dist = 0, bool playerOnly = false, uint64 excludeGUID = 0, float mind_dist = 0.0f);
         Unit* SelectUnit(SelectAggroTarget targetType, uint32 position, float maxdist, bool playerOnly, Powers powerOnly);
 
+		//Checks the supplied Target for auras from spells that should trigger an aggro loss
+		bool ShouldBreakAggro(Unit* Target);				
+
+		//Checks all victims in the current threat list for CC's / Buffs that should cause an aggro loss / make them unattackable
+		void FlagInvalidTargetsUnattackable();
+
         template <class PREDICATE>
         Unit* SelectUnit(SelectAggroTarget targetType, uint32 position, PREDICATE const& predicate)
         {
