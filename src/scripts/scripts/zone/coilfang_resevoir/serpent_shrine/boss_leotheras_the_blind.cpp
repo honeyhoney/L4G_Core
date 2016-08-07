@@ -188,6 +188,7 @@ struct boss_leotheras_the_blindAI : public ScriptedAI
 
     uint64 InnderDemon[5];
     uint32 InnderDemon_Count;
+	uint32 InnerDemon_TargetCount;
     uint64 Demon;
     uint64 SpellBinderGUID[3];
     uint64 actualtarget;
@@ -351,7 +352,7 @@ struct boss_leotheras_the_blindAI : public ScriptedAI
 
     void CastConsumingMadness() //remove this once SPELL_INSIDIOUS_WHISPER is supported by core
     {
-        for(int i=0; i<5; i++)
+        for(int i=0; i<InnerDemon_TargetCount; i++)
         {
             if(InnderDemon[i] > 0 )
             {
@@ -541,11 +542,19 @@ struct boss_leotheras_the_blindAI : public ScriptedAI
                 std::list<HostilReference *>& ThreatList = m_creature->getThreatManager().getThreatList();
                 std::vector<Unit *> TargetList;
 
+				InnerDemon_TargetCount = urand(3, 5);
                 for(std::list<HostilReference *>::iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
                 {
                     Unit *tempTarget = SelectUnit(SELECT_TARGET_RANDOM, 0, 100, true);
-                    if(tempTarget && !tempTarget->HasAura(SPELL_CONSUMING_MADNESS,0) && tempTarget->GetGUID() != m_creature->getVictimGUID() && std::find(TargetList.begin(), TargetList.end(), tempTarget) == TargetList.end() && TargetList.size() < 5)
-                        TargetList.push_back(tempTarget);
+					if (tempTarget &&
+						!tempTarget->HasAura(SPELL_CONSUMING_MADNESS, 0) &&
+						tempTarget->GetGUID() != m_creature->getVictimGUID() &&
+						std::find(TargetList.begin(), TargetList.end(), tempTarget) == TargetList.end()	&& 
+						TargetList.size() < InnerDemon_TargetCount)
+					{
+						TargetList.push_back(tempTarget);
+					}
+                        
                 }
 
                 SpellEntry *spell = (SpellEntry *)GetSpellStore()->LookupEntry(SPELL_INSIDIOUS_WHISPER);
@@ -553,7 +562,7 @@ struct boss_leotheras_the_blindAI : public ScriptedAI
                 {
                     if( (*itr) && (*itr)->isAlive() )
                     {
-                        Creature * demon = (Creature *)m_creature->SummonCreature(INNER_DEMON_ID, (*itr)->GetPositionX()+10, (*itr)->GetPositionY()+10, (*itr)->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
+                        Creature * demon = (Creature *)m_creature->SummonCreature(INNER_DEMON_ID, (*itr)->GetPositionX()+5, (*itr)->GetPositionY()+5, (*itr)->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
                         if(demon)
                         {
                             ((ScriptedAI *)demon->AI())->AttackStart( (*itr) );
@@ -565,7 +574,7 @@ struct boss_leotheras_the_blindAI : public ScriptedAI
                                     continue;
                                 (*itr)->AddAura(new InsidiousAura(spell, i, NULL, (*itr), (*itr)));
                             }
-                            if( InnderDemon_Count > 4 ) InnderDemon_Count = 0;
+                            if( InnderDemon_Count > (InnerDemon_TargetCount - 1)) InnderDemon_Count = 0;
 
                             //Safe storing of creatures
                             InnderDemon[InnderDemon_Count] = demon->GetGUID();
