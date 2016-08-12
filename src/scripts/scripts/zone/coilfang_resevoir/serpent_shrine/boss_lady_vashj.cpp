@@ -557,8 +557,8 @@ struct boss_lady_vashjAI : public ScriptedAI
         //Phase 2
         else
         {
-			me->SetReactState(REACT_PASSIVE);
 			me->AttackStop();
+			me->SetReactState(REACT_PASSIVE);
 
             //ForkedLightning_Timer
             if(ForkedLightning_Timer < diff)
