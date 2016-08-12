@@ -3397,13 +3397,17 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesEx2 |= SPELL_ATTR_EX2_IGNORE_LOS;
                 break;
             case 835:   // Tidal Charm
+            case 13120: // Net-o-Matic
+            case 15712: // Linken's Boomerang
             case 21358: // Aqual Quintessence / Eternal Quintessence
-            case 47977: // Broom Broom
-            case 42679:
-            case 42673:
-            case 42680:
-            case 42681:
-            case 42683:
+            case 30452: // Rocket Boots Engaged (triggered Buff)
+            case 51582: // Rocket Boots Engaged (Boots Spell)
+            case 47977: // Event Broom Mounts without Casttime 
+            case 42679: 
+            case 42673: 
+            case 42680: 
+            case 42681: 
+            case 42683: 
             case 42684:
                 spellInfo->AttributesEx4 |= SPELL_ATTR_EX4_NOT_USABLE_IN_ARENA;
                 break;
@@ -3581,8 +3585,8 @@ void SpellMgr::LoadSpellCustomAttr()
             case 32686: //earthsquake doomwalker 
                 spellInfo->AttributesCu |= SPELL_ATTR_CU_IGNORE_ARMOR; 
                 break;
-            case 44032: // Mind Exhaust  Magtheridon
-                spellInfo->DurationIndex = 23;
+            case 44032: // Mind Exhaustion Magtheridon
+                spellInfo->DurationIndex = 25;
             break;
             case 24869: //Halooween food
                 spellInfo->Effect[2] = 6;
