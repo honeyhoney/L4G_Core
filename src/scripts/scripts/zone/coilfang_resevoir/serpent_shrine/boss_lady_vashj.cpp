@@ -557,6 +557,9 @@ struct boss_lady_vashjAI : public ScriptedAI
         //Phase 2
         else
         {
+			me->SetReactState(REACT_PASSIVE);
+			me->AttackStop();
+
             //ForkedLightning_Timer
             if(ForkedLightning_Timer < diff)
             {
@@ -566,7 +569,7 @@ struct boss_lady_vashjAI : public ScriptedAI
 
                 if(!target)
                     target = me->getVictim();
-
+								
 				me->SetInFront(target);
                 DoCast(target, SPELL_FORKED_LIGHTNING);
 
