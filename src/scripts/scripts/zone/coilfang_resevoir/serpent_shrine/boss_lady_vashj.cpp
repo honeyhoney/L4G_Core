@@ -567,6 +567,7 @@ struct boss_lady_vashjAI : public ScriptedAI
                 if(!target)
                     target = me->getVictim();
 
+				me->SetInFront(target);
                 DoCast(target, SPELL_FORKED_LIGHTNING);
 
                 ForkedLightning_Timer = 2000+rand()%6000;   //blizzlike
