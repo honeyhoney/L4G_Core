@@ -1,23 +1,54 @@
 #include "precompiled.h"
 #include "def_sethekk_halls.h"
 
+#define EVENT_ANZU 1
 
-#define SPELL_SPELL_BOMB                40303
-#define SPELL_CYCLONE_OF_FEATHERS       40321
-#define SPELL_PARALYZING_SCREECH        40184
-#define SPELL_BANISH                    42354   // probably completly wrong spell
+enum Spells
+{
+    SPELL_OTHERWORLDLY_PORTAL      = 39952,
+    SPELL_BLUE_SUMMON_BEAMS        = 39978,
+    SPELL_RED_LIGHTNING_BOLT       = 39990,
+    SPELL_PURPLE_ORB               = 39123,
 
-#define SPELL_PROTECTION_OF_THE_HAWK    40237
-#define SPELL_SPITE_OF_THE_EAGLE        40240
-#define SPELL_SPEED_OF_THE_FALCON       40241
+    SPELL_SPELL_BOMB               = 40303,
+    SPELL_CYCLONE_OF_FEATHERS      = 40321,
+    SPELL_PARALYZING_SCREECH       = 40184,
+    SPELL_BANISH                   = 42354,   // Probably the completely wrong spell
 
-#define NPC_HAWK_SPIRIT                 23134
-#define NPC_EAGLE_SPIRIT                23136
-#define NPC_FALCON_SPIRIT               23135
+    SPELL_PROTECTION_OF_THE_HAWK   = 40237,
+    SPELL_SPITE_OF_THE_EAGLE       = 40240,
+    SPELL_SPEED_OF_THE_FALCON      = 40241
+};
 
-#define NPC_BROOD_OF_ANZU               23132
+enum Creatures
+{
+    NPC_ANZU                       = 23035,
 
-#define GO_RAVENS_CLAW                   185554
+    NPC_RAVEN_GOD_TARGET           = 23057,
+    NPC_RAVEN_GOD_CASTER           = 23058,
+
+    NPC_HAWK_SPIRIT                = 23134,
+    NPC_FALCON_SPIRIT              = 23135,
+    NPC_EAGLE_SPIRIT               = 23136,
+
+    NPC_BROOD_OF_ANZU              = 23132
+};
+
+enum GameObjects
+{
+    GO_RAVENS_CLAW                  = 185554,
+    GO_MOONSTONE                    = 185590,
+    GO_SUMMONING_RIFT               = 185595
+};
+
+enum Events
+{
+    EVENT_SUMMONING_RITUAL = 1,
+    EVENT_SPELL_BOMB = 5,
+    EVENT_CYCLONE_OF_FEATHERS       = 2,
+    EVENT_PARALYZING_SCREECH  = 3,
+    EVENT_BANISH  = 4,
+};
 
 uint32 AnzuSpirits[] = {NPC_HAWK_SPIRIT, NPC_EAGLE_SPIRIT, NPC_FALCON_SPIRIT};
 
@@ -27,15 +58,23 @@ float AnzuSpiritLoc[][3] = {
     { -62, 288, 27 }
 };
 
-struct boss_anzuAI : public ScriptedAI
+float BeamCasterLoc[][3] =
 {
-    boss_anzuAI(Creature* c) : ScriptedAI(c), summons(c)
+    {-88, 304, 35},
+    {-62, 288, 35},
+    {-85, 271, 35},
+    {-94, 288, 35}
+};
+
+struct boss_anzuAI : public BossAI
+{
+    boss_anzuAI(Creature* c) : BossAI(c, EVENT_ANZU), summons(c)
     {
         pInstance = c->GetInstanceData();
     }
 
-    SummonList summons;
     ScriptedInstance* pInstance;
+    SummonList summons;
 
     bool Banished;
     uint32 Banish_Timer;
@@ -44,31 +83,33 @@ struct boss_anzuAI : public ScriptedAI
     uint32 ParalyzingScreech_Timer;
     uint8 BanishedTimes;
     uint8 BroodCount;
+    uint64 BeamTargetGuid;
 
     void Reset()
     {
         ClearCastQueue();
-        summons.DespawnAll();
+        events.Reset();
 
+        events.ScheduleEvent(EVENT_SUMMONING_RITUAL, 0);
+
+        BeamTargetGuid = 0;
+        //summons.DespawnAll();
+        /*
         Banished = false;
         Banish_Timer = 0;
         SpellBomb_Timer = 17000; 
         CycloneOfFeathers_Timer = 5000;
         ParalyzingScreech_Timer = 14000;
         BanishedTimes = 2;
+        */
 
-        if(pInstance)
-            pInstance->SetData(DATA_ANZUEVENT, NOT_STARTED);
+        pInstance->SetData(DATA_ANZUEVENT, NOT_STARTED);
     }
 
     void IsSummonedBy(Unit *summoner) 
     {
-        GameObject* go = FindGameObject(GO_RAVENS_CLAW, 20, me);
-        if(go)
-        {
-            go->Delete();
-        }
-
+        //DoCast(me, SPELL_BANISH);
+        //me->SetVisibility(VISIBILITY_OFF);
     }
 
     void JustSummoned(Creature *summon)
@@ -77,6 +118,22 @@ struct boss_anzuAI : public ScriptedAI
         {
             summon->AI()->AttackStart(me->getVictim());
             BroodCount++;
+        }
+        if(summon->GetEntry() == NPC_RAVEN_GOD_CASTER)
+        {
+            sLog.outString("Spawned a caster");
+        }
+        if(summon->GetEntry() == NPC_RAVEN_GOD_TARGET)
+        {
+            sLog.outString("Spawned a target");
+            /*
+            summon->CastSpell(summon, SPELL_PURPLE_ORB, true);
+            summon->SetSpeed(MOVE_RUN, 0.5f);
+            summon->SetLevitate(true);
+            summon->SetWalk(false);
+            summon->SetHomePosition(-87, 288, 36, 0);
+            summon->GetMotionMaster()->MoveTargetedHome();
+            */
         }
         summons.Summon(summon);
     }
@@ -88,6 +145,16 @@ struct boss_anzuAI : public ScriptedAI
         summons.Despawn(summon);
     }
 
+    void SummonPurpleOrb()
+    {
+        BeamTargetGuid = me->SummonCreature(NPC_RAVEN_GOD_TARGET, -87, 287, 48, 0,  TEMPSUMMON_CORPSE_DESPAWN, 0)->GetGUID();
+    }
+
+    void SummonBeamCasters()
+    {
+        for(uint8 i = 0; i < 3; i++)
+            me->SummonCreature(NPC_RAVEN_GOD_CASTER, BeamCasterLoc[i][0], BeamCasterLoc[i][1], BeamCasterLoc[i][2], 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+    }
 
     void SummonSpirits()
     {
@@ -117,6 +184,32 @@ struct boss_anzuAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
+        events.Update(diff);
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {    
+            case EVENT_SUMMONING_RITUAL:
+                {
+                    SummonPurpleOrb();
+                    SummonBeamCasters();
+                    /*
+                    DoCast(me, SPELL_RED_LIGHTNING_BOLT);
+                    FindGameObject(GO_RAVENS_CLAW, 20, me)->Delete();
+                    FindGameObject(GO_MOONSTONE, 20, me)->Delete();
+                    FindGameObject(GO_SUMMONING_RIFT, 20, me)->Delete();
+                    me->SetVisibility(VISIBILITY_ON);
+                    */
+                    DoScriptText(-1548050, me); 
+                    break;
+                }
+            }
+        }
+
+        //CastNextSpellIfAnyAndReady();
+        //DoMeleeAttackIfReady();
+        /**
         if (!UpdateVictim())
             return;
 
@@ -166,12 +259,13 @@ struct boss_anzuAI : public ScriptedAI
         CastNextSpellIfAnyAndReady();
         if(!Banished)
             DoMeleeAttackIfReady();
+        */
     }
 };
 
 CreatureAI* GetAI_boss_anzu(Creature *_Creature)
 {
-    return new boss_anzuAI (_Creature);
+    return new boss_anzuAI(_Creature);
 }
 
 struct npc_anzu_spiritAI : public Scripted_NoMovementAI
@@ -224,17 +318,72 @@ struct npc_anzu_spiritAI : public Scripted_NoMovementAI
 
 CreatureAI* GetAI_npc_eagle_spirit(Creature *_Creature)
 {
-    return new npc_anzu_spiritAI (_Creature, SPELL_SPITE_OF_THE_EAGLE);
+    return new npc_anzu_spiritAI(_Creature, SPELL_SPITE_OF_THE_EAGLE);
 }
 
 CreatureAI* GetAI_npc_hawk_spirit(Creature *_Creature)
 {
-    return new npc_anzu_spiritAI (_Creature, SPELL_PROTECTION_OF_THE_HAWK);
+    return new npc_anzu_spiritAI(_Creature, SPELL_PROTECTION_OF_THE_HAWK);
 }
 
 CreatureAI* GetAI_npc_falcon_spirit(Creature *_Creature)
 {
-    return new npc_anzu_spiritAI (_Creature, SPELL_SPEED_OF_THE_FALCON);
+    return new npc_anzu_spiritAI(_Creature, SPELL_SPEED_OF_THE_FALCON);
+}
+
+struct npc_purple_orbAI : public ScriptedAI
+{
+    npc_purple_orbAI(Creature* c) : ScriptedAI(c)
+    {
+
+    }
+
+    uint32 MovePhase;
+    uint32 Timer;
+
+    void Reset()
+    {
+        me->SetSpeed(MOVE_RUN, 0.5f);
+        me->SetLevitate(true);
+        //me->SetWalk(false);
+        me->SetHomePosition(-87, 288, 36, 0);
+        me->GetMotionMaster()->MoveTargetedHome();
+
+        Timer = 0;
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        if (Timer < diff)
+        {
+            me->CastSpell(me, SPELL_PURPLE_ORB, true);
+            Timer = 1000;
+        }
+        else
+        {
+            Timer -= diff;
+        }
+    }
+};
+
+CreatureAI* GetAI_npc_purple_orb(Creature *_Creature)
+{
+    return new npc_purple_orbAI(_Creature);
+}
+
+bool go_raven_claw(Player *player, GameObject* go)
+{
+    ScriptedInstance* instance = (ScriptedInstance*) go->GetInstanceData();
+
+    if (!instance)
+        return false;
+
+    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOTSELECTABLE);
+    go->SummonGameObject(GO_MOONSTONE, go->GetPositionX(), go->GetPositionY()+0.2, go->GetPositionZ()+4, go->GetOrientation(), 0, 0, 0, 0, 0);
+    go->SummonGameObject(GO_SUMMONING_RIFT, go->GetPositionX(), go->GetPositionY(), go->GetPositionZ()+5, go->GetOrientation(), 0, 0, 0, 0, 0);
+    go->CastSpell(go, SPELL_OTHERWORLDLY_PORTAL);
+
+    return true;
 }
 
 void AddSC_boss_anzu()
@@ -259,5 +408,15 @@ void AddSC_boss_anzu()
     newscript = new Script;
     newscript->Name="npc_hawk_spirit";
     newscript->GetAI = &GetAI_npc_hawk_spirit;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name="npc_purple_orb";
+    newscript->GetAI = &GetAI_npc_purple_orb;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name="go_raven_claw";
+    newscript->pGOUse = &go_raven_claw;
     newscript->RegisterSelf();
 }
