@@ -3796,14 +3796,19 @@ void SpellMgr::LoadSpellCustomAttr()
             case 40179:
                 spellInfo->Targets = TARGET_FLAG_GAMEOBJECT;
                 break;
-            case 26983: //Tranquility targets
+            case 26983: // Tranquility targets
             case 44208: 
                 spellInfo->Targets = TARGET_FLAG_DEST_LOCATION;
                 break;
-            case 39978: //Raven god summon beams
-            //case 39952: //Otherworldly Portal    
+            case 39978: // Raven god summon beams
                 spellInfo->Targets = TARGET_UNIT_TARGET_ANY;
                 spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
+                break;
+            case 39123: // Purple Beam (purple orb used in Anzu summon event)
+                spellInfo->AttributesEx |= SPELL_ATTR_EX_CHANNELED_1;
+                spellInfo->ChannelInterruptFlags = 0;
+                spellInfo->InterruptFlags = 0;
+                spellInfo->AuraInterruptFlags = 0;
                 break;
             default:
                 break;

@@ -17,7 +17,9 @@ enum Spells
 
     SPELL_PROTECTION_OF_THE_HAWK   = 40237,
     SPELL_SPITE_OF_THE_EAGLE       = 40240,
-    SPELL_SPEED_OF_THE_FALCON      = 40241
+    SPELL_SPEED_OF_THE_FALCON      = 40241,
+
+    SPELL_CAMERA_SHAKE             = 39983
 };
 
 enum Creatures
@@ -43,11 +45,13 @@ enum GameObjects
 
 enum Events
 {
-    EVENT_SUMMONING_RITUAL = 1,
-    EVENT_SPELL_BOMB = 5,
-    EVENT_CYCLONE_OF_FEATHERS       = 2,
-    EVENT_PARALYZING_SCREECH  = 3,
-    EVENT_BANISH  = 4,
+    EVENT_SUMMONING_RITUAL_START = 1,
+    EVENT_SUMMONING_RITUAL_BOLT = 3,
+    EVENT_SUMMONING_RITUAL_END = 4,
+    EVENT_SPELL_BOMB = 99,
+    EVENT_CYCLONE_OF_FEATHERS       = 79,
+    EVENT_PARALYZING_SCREECH  = 39,
+    EVENT_BANISH  = 49,
 };
 
 uint32 AnzuSpirits[] = {NPC_HAWK_SPIRIT, NPC_EAGLE_SPIRIT, NPC_FALCON_SPIRIT};
@@ -58,12 +62,16 @@ float AnzuSpiritLoc[][3] = {
     { -62, 288, 27 }
 };
 
-float BeamCasterLoc[][3] =
+float BeamCasterLoc[][2] =
 {
-    {-88, 304, 35},
-    {-62, 288, 35},
-    {-85, 271, 35},
-    {-94, 288, 35}
+    {-64, 286},
+    {-77, 279},
+    {-87, 270},
+    {-101, 278},
+    {-110, 288},
+    {-96, 299},
+    {-89, 304},
+    {-75, 297}
 };
 
 struct boss_anzuAI : public BossAI
@@ -90,7 +98,7 @@ struct boss_anzuAI : public BossAI
         ClearCastQueue();
         events.Reset();
 
-        events.ScheduleEvent(EVENT_SUMMONING_RITUAL, 0);
+        events.ScheduleEvent(EVENT_SUMMONING_RITUAL_START, 0);
 
         BeamTargetGuid = 0;
         //summons.DespawnAll();
@@ -108,8 +116,8 @@ struct boss_anzuAI : public BossAI
 
     void IsSummonedBy(Unit *summoner) 
     {
-        //DoCast(me, SPELL_BANISH);
-        //me->SetVisibility(VISIBILITY_OFF);
+        DoCast(me, SPELL_BANISH);
+        me->SetVisibility(VISIBILITY_OFF);
     }
 
     void JustSummoned(Creature *summon)
@@ -122,18 +130,16 @@ struct boss_anzuAI : public BossAI
         if(summon->GetEntry() == NPC_RAVEN_GOD_CASTER)
         {
             sLog.outString("Spawned a caster");
+            summon->SetLevitate(true);
+            summon->CastSpell(instance->GetCreature(BeamTargetGuid), SPELL_BLUE_SUMMON_BEAMS, true);
         }
         if(summon->GetEntry() == NPC_RAVEN_GOD_TARGET)
         {
             sLog.outString("Spawned a target");
-            /*
-            summon->CastSpell(summon, SPELL_PURPLE_ORB, true);
-            summon->SetSpeed(MOVE_RUN, 0.5f);
+            summon->CastSpell(summon, SPELL_PURPLE_ORB, false);
             summon->SetLevitate(true);
-            summon->SetWalk(false);
-            summon->SetHomePosition(-87, 288, 36, 0);
-            summon->GetMotionMaster()->MoveTargetedHome();
-            */
+            summon->SetSpeed(MOVE_FLIGHT, 0.1f);
+            summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ()-12.6);
         }
         summons.Summon(summon);
     }
@@ -147,13 +153,13 @@ struct boss_anzuAI : public BossAI
 
     void SummonPurpleOrb()
     {
-        BeamTargetGuid = me->SummonCreature(NPC_RAVEN_GOD_TARGET, -87, 287, 48, 0,  TEMPSUMMON_CORPSE_DESPAWN, 0)->GetGUID();
+        BeamTargetGuid = me->SummonCreature(NPC_RAVEN_GOD_TARGET, -87.5742, 287.856, 48.5, 0,  TEMPSUMMON_CORPSE_DESPAWN, 0)->GetGUID();
     }
 
     void SummonBeamCasters()
     {
-        for(uint8 i = 0; i < 3; i++)
-            me->SummonCreature(NPC_RAVEN_GOD_CASTER, BeamCasterLoc[i][0], BeamCasterLoc[i][1], BeamCasterLoc[i][2], 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+        for(uint8 i = 0; i < 8; i++)
+            me->SummonCreature(NPC_RAVEN_GOD_CASTER, BeamCasterLoc[i][0], BeamCasterLoc[i][1], urand(38, 45), 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
     void SummonSpirits()
@@ -190,18 +196,27 @@ struct boss_anzuAI : public BossAI
         {
             switch (eventId)
             {    
-            case EVENT_SUMMONING_RITUAL:
+            case EVENT_SUMMONING_RITUAL_START:
                 {
                     SummonPurpleOrb();
                     SummonBeamCasters();
-                    /*
-                    DoCast(me, SPELL_RED_LIGHTNING_BOLT);
+                    events.ScheduleEvent(EVENT_SUMMONING_RITUAL_BOLT, 20000);
+                    break;
+                }
+            case EVENT_SUMMONING_RITUAL_BOLT:
+                {
+                    me->CastSpell(me, SPELL_CAMERA_SHAKE, false);
+                    pInstance->GetCreature(BeamTargetGuid)->CastSpell(me, SPELL_RED_LIGHTNING_BOLT, false); // cast it on 'me', it will target self (BeamTarget NPC) anyway
+                    events.ScheduleEvent(EVENT_SUMMONING_RITUAL_END, 2000);
+                    break;
+                }
+            case EVENT_SUMMONING_RITUAL_END:
+                {
                     FindGameObject(GO_RAVENS_CLAW, 20, me)->Delete();
                     FindGameObject(GO_MOONSTONE, 20, me)->Delete();
                     FindGameObject(GO_SUMMONING_RIFT, 20, me)->Delete();
+                    pInstance->GetCreature(BeamTargetGuid)->DisappearAndDie();
                     me->SetVisibility(VISIBILITY_ON);
-                    */
-                    DoScriptText(-1548050, me); 
                     break;
                 }
             }
@@ -331,46 +346,6 @@ CreatureAI* GetAI_npc_falcon_spirit(Creature *_Creature)
     return new npc_anzu_spiritAI(_Creature, SPELL_SPEED_OF_THE_FALCON);
 }
 
-struct npc_purple_orbAI : public ScriptedAI
-{
-    npc_purple_orbAI(Creature* c) : ScriptedAI(c)
-    {
-
-    }
-
-    uint32 MovePhase;
-    uint32 Timer;
-
-    void Reset()
-    {
-        me->SetSpeed(MOVE_RUN, 0.5f);
-        me->SetLevitate(true);
-        //me->SetWalk(false);
-        me->SetHomePosition(-87, 288, 36, 0);
-        me->GetMotionMaster()->MoveTargetedHome();
-
-        Timer = 0;
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        if (Timer < diff)
-        {
-            me->CastSpell(me, SPELL_PURPLE_ORB, true);
-            Timer = 1000;
-        }
-        else
-        {
-            Timer -= diff;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_purple_orb(Creature *_Creature)
-{
-    return new npc_purple_orbAI(_Creature);
-}
-
 bool go_raven_claw(Player *player, GameObject* go)
 {
     ScriptedInstance* instance = (ScriptedInstance*) go->GetInstanceData();
@@ -408,11 +383,6 @@ void AddSC_boss_anzu()
     newscript = new Script;
     newscript->Name="npc_hawk_spirit";
     newscript->GetAI = &GetAI_npc_hawk_spirit;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name="npc_purple_orb";
-    newscript->GetAI = &GetAI_npc_purple_orb;
     newscript->RegisterSelf();
 
     newscript = new Script;
