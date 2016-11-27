@@ -3800,6 +3800,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 44208: 
                 spellInfo->Targets = TARGET_FLAG_DEST_LOCATION;
                 break;
+            case 39952: // Otherworldly Portal
             case 39978: // Raven god summon beams
                 spellInfo->Targets = TARGET_UNIT_TARGET_ANY;
                 spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
