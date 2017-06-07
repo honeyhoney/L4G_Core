@@ -79,6 +79,8 @@ struct boss_maiden_of_virtueAI : public ScriptedAI
 
     void KilledUnit(Unit* Victim)
     {
+        IncrementKillCount();
+
         if(rand()%2)
             return;
 
@@ -87,6 +89,8 @@ struct boss_maiden_of_virtueAI : public ScriptedAI
 
     void JustDied(Unit* Killer)
     {
+        EndFightTimer();
+
         DoScriptText(SAY_DEATH, m_creature);
 
         if (pInstance)
@@ -95,6 +99,8 @@ struct boss_maiden_of_virtueAI : public ScriptedAI
 
     void EnterCombat(Unit *who)
     {
+        StartFightTimer();
+
         DoScriptText(SAY_AGGRO, m_creature);
         if (pInstance)
             pInstance->SetData(DATA_MAIDENOFVIRTUE_EVENT, IN_PROGRESS);

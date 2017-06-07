@@ -233,6 +233,8 @@ struct boss_terestianAI : public ScriptedAI
 
     void EnterCombat(Unit* /*who*/)
     {
+        StartFightTimer();
+
         DoScriptText(SAY_AGGRO, me);
     }
 
@@ -253,6 +255,8 @@ struct boss_terestianAI : public ScriptedAI
 
     void KilledUnit(Unit * /*victim*/)
     {
+        EndFightTimer();
+
         DoScriptText(RAND(SAY_SLAY1, SAY_SLAY2), me);
     }
 

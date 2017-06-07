@@ -155,6 +155,8 @@ struct boss_moroesAI : public ScriptedAI
 
     void EnterCombat(Unit* who)
     {
+        StartFightTimer();
+
         StartEvent();
 
         DoScriptText(SAY_AGGRO, m_creature);
@@ -164,11 +166,15 @@ struct boss_moroesAI : public ScriptedAI
 
     void KilledUnit(Unit* victim)
     {
+        IncrementKillCount();
+
         DoScriptText(RAND(SAY_KILL_1, SAY_KILL_2, SAY_KILL_3), m_creature);
     }
 
     void JustDied(Unit* victim)
     {
+        EndFightTimer();
+
         DoScriptText(SAY_DEATH, m_creature);
 
         if (pInstance)
@@ -428,6 +434,18 @@ struct boss_moroes_guestAI : public ScriptedAI
     {
         if(pInstance)
             pInstance->SetData(DATA_MOROES_EVENT, NOT_STARTED);
+    }
+
+    void KilledUnit(Unit *victim)
+    {
+        /**
+        Placeholder
+        Creature *pMidnight = Unit::GetCreature(*m_creature, Midnight);
+        if (pMidnight && pMidnight->GetTypeId() == TYPEID_UNIT)
+        {
+            ((boss_midnightAI*)(pMidnight->AI()))->IncrementKillCount();
+        }
+        */
     }
 
     void AcquireGUID()

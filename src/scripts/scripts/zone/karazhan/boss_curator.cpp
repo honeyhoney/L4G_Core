@@ -83,17 +83,23 @@ struct boss_curatorAI : public ScriptedAI
 
     void KilledUnit(Unit *victim)
     {
+        IncrementKillCount();
+
         DoScriptText(RAND(SAY_KILL1, SAY_KILL2), m_creature);
     }
 
     void JustDied(Unit *victim)
     {
+        EndFightTimer();
+
         DoScriptText(SAY_DEATH, m_creature);
         pInstance->SetData(DATA_CURATOR_EVENT, DONE);
     }
 
     void EnterCombat(Unit *who)
     {
+        StartFightTimer();
+
         DoScriptText(SAY_AGGRO, m_creature);
         pInstance->SetData(DATA_CURATOR_EVENT, IN_PROGRESS);
     }

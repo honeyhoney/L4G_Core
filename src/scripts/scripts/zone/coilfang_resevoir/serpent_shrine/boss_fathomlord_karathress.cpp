@@ -223,11 +223,15 @@ struct boss_fathomlord_karathressAI : public ScriptedAI
 
     void KilledUnit(Unit *victim)
     {
+        IncrementKillCount();
+
         DoScriptText(RAND(SAY_SLAY1, SAY_SLAY2, SAY_SLAY3), m_creature);
     }
 
     void JustDied(Unit *killer)
     {
+        EndFightTimer();
+
         ServerFirst(killer);
 
         DoScriptText(SAY_DEATH, m_creature);
@@ -240,6 +244,8 @@ struct boss_fathomlord_karathressAI : public ScriptedAI
 
     void EnterCombat(Unit *who)
     {
+        StartFightTimer();
+
         StartEvent(who);
     }
 

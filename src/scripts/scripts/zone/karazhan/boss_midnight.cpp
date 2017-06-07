@@ -101,12 +101,16 @@ struct boss_midnightAI : public ScriptedAI
 
     void EnterCombat(Unit* who)
     {
+        StartFightTimer();
+
         pInstance->SetData(DATA_ATTUMEN_EVENT, IN_PROGRESS);
         DoZoneInCombat();
     }
 
     void KilledUnit(Unit *victim)
     {
+        IncrementKillCount();
+
         if (Phase == 2)
             if (Unit *pUnit = Unit::GetUnit(*m_creature, Attumen))
                 DoScriptText(SAY_MIDNIGHT_KILL, pUnit);
@@ -260,14 +264,25 @@ struct boss_attumenAI : public ScriptedAI
 
     void KilledUnit(Unit *victim)
     {
+        Creature *pMidnight = Unit::GetCreature(*m_creature, Midnight);
+        if (pMidnight && pMidnight->GetTypeId() == TYPEID_UNIT)
+        {
+            ((boss_midnightAI*)(pMidnight->AI()))->IncrementKillCount();
+        }
+
         DoScriptText(RAND(SAY_KILL1, SAY_KILL2), m_creature);
     }
 
     void JustDied(Unit *victim)
     {
-        DoScriptText(SAY_DEATH, m_creature);
-        if (Unit *pMidnight = Unit::GetUnit(*m_creature, Midnight))
+        Creature *pMidnight = Unit::GetCreature(*m_creature, Midnight);
+        if (pMidnight && pMidnight->GetTypeId() == TYPEID_UNIT)
+        {
+            ((boss_midnightAI*)(pMidnight->AI()))->EndFightTimer();
             pMidnight->DealDamage(pMidnight, pMidnight->GetHealth(), DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+        }
+
+        DoScriptText(SAY_DEATH, m_creature);
 
         pInstance->SetData(DATA_ATTUMEN_EVENT, DONE);
     }

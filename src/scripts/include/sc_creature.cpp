@@ -113,6 +113,7 @@ bool SummonList::isEmpty()
 ScriptedAI::ScriptedAI(Creature* pCreature) :
 CreatureAI(pCreature), m_creature(pCreature), IsFleeing(false), m_bCombatMovement(true), m_uiEvadeCheckCooldown(2500), autocast(false)
 {
+    killCount = 0;
     m_specialThingTimer = 0;
     HeroicMode = m_creature->GetMap()->IsHeroic();
 }
@@ -1106,6 +1107,47 @@ void ScriptedAI::ServerFirst(Unit *killer)
     }
         
 }
+
+void ScriptedAI::StartFightTimer()
+{
+    // Start fight timer (if already exists update with new time)
+    RealmDataDatabase.PExecute("INSERT INTO `boss_times` (`instance_id`, `creature_id`) VALUES (%i, %i) ON DUPLICATE KEY UPDATE `start_time` =  CURTIME()", m_creature->GetInstanceId(), m_creature->GetEntry()); 
+}
+
+void ScriptedAI::EndFightTimer()
+{
+    std::ostringstream ss;
+    Map* pMap = m_creature->GetMap();
+    Map::PlayerList const &players = pMap->GetPlayers();
+    if (!players.isEmpty())
+    {
+        for(Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+        {
+            if (Player* player = i->getSource())
+            {
+                if (player->isGameMaster())
+                {
+                    continue;
+                }
+                ss << player->GetGUIDLow();
+                if (i->hasNext())
+                {
+                    ss << " ";
+                }
+            }
+        }
+    }
+    RealmDataDatabase.PExecute("UPDATE `boss_times` SET `end_time` = CURTIME(), `players` = '%s', `deaths` = %i WHERE `instance_id` = %i AND `creature_id` = %i", ss.str().c_str(), killCount, m_creature->GetInstanceId(), m_creature->GetEntry()); 
+}
+
+void ScriptedAI::IncrementKillCount()
+{
+    sLog.outString("IncrementKillCount()");
+    sLog.outString("Old count: %i", killCount);
+    killCount += 1;
+    sLog.outString("New count: %i", killCount);
+}
+
 
 BossAI::BossAI(Creature *c, uint32 id) : ScriptedAI(c),
     bossId(id), summons(me), instance(c->GetInstanceData())

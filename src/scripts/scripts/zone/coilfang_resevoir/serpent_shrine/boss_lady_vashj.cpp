@@ -299,11 +299,15 @@ struct boss_lady_vashjAI : public ScriptedAI
 
     void KilledUnit(Unit *victim)
     {
+        IncrementKillCount();
+
         DoScriptText(RAND(SAY_SLAY1, SAY_SLAY2, SAY_SLAY3), me);
     }
 
     void JustDied(Unit *killer)
     {
+        EndFightTimer();
+
         ServerFirst(killer);
 
         Paralyze(false);
@@ -324,6 +328,8 @@ struct boss_lady_vashjAI : public ScriptedAI
 
     void EnterCombat(Unit *who)
     {
+        StartFightTimer();
+
         if (instance)
         {
             //remove old tainted cores to prevent cheating in phase 2

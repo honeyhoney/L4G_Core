@@ -368,6 +368,8 @@ struct boss_leotheras_the_blindAI : public ScriptedAI
 
     void KilledUnit(Unit *victim)
     {
+        IncrementKillCount();
+
         if (victim->GetTypeId() != TYPEID_PLAYER)
             return;
 
@@ -379,6 +381,8 @@ struct boss_leotheras_the_blindAI : public ScriptedAI
 
     void JustDied(Unit *killer)
     {
+        EndFightTimer();
+
         ServerFirst(killer);
 
         DoScriptText(SAY_DEATH, m_creature);
@@ -396,6 +400,8 @@ struct boss_leotheras_the_blindAI : public ScriptedAI
 
     void EnterCombat(Unit *who)
     {
+        StartFightTimer();
+
         if(m_creature->HasAura(AURA_BANISH, 0))
             return;
         AttackStart(who);
@@ -652,6 +658,8 @@ struct boss_leotheras_the_blind_demonformAI : public ScriptedAI
 
     void KilledUnit(Unit *victim)
     {
+        IncrementKillCount();
+
         if (victim->GetTypeId() != TYPEID_PLAYER)
             return;
 

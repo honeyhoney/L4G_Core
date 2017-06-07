@@ -169,6 +169,8 @@ struct boss_aranAI : public ScriptedAI
 
     void JustDied(Unit *victim)
     {
+        EndFightTimer();
+
         DoScriptText(SAY_DEATH, m_creature);
 
         if(pInstance)
@@ -197,6 +199,8 @@ struct boss_aranAI : public ScriptedAI
 
     void EnterCombat(Unit *who)
     {
+        StartFightTimer();
+
         if (PlayerHaveAtiesh())
             DoScriptText(SAY_ATIESH, m_creature);
         else

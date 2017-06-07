@@ -249,6 +249,8 @@ struct boss_netherspiteAI : public ScriptedAI
 
     void EnterCombat(Unit *who)
     {
+        StartFightTimer();
+
         HandleDoors(false);
         SwitchToPortalPhase();
 
@@ -262,6 +264,8 @@ struct boss_netherspiteAI : public ScriptedAI
 
     void JustDied(Unit* killer)
     {
+        EndFightTimer();
+
         HandleDoors(true);
         DestroyPortals();
         if (pInstance)

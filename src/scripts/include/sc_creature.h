@@ -275,6 +275,9 @@ struct ScriptedAI : public CreatureAI
     //True if autocast is enabled
     bool autocast;
 
+    // Number of players killed during a fight
+    uint32 killCount;
+
     //*************
     //Pure virtual functions
     //*************
@@ -381,8 +384,15 @@ struct ScriptedAI : public CreatureAI
 
     void DoSpecialThings(uint32 diff, SpecialThing, float range = 200.0f, float speedRate = 2.0f);
 
+    // Add to a creature for server first message announcement
     void ServerFirst(Unit *killer);
 
+    // Boss time logging
+    void StartFightTimer();
+    void EndFightTimer();
+    void IncrementKillCount();
+
+    // No related to fight duration timings
     uint32 m_specialThingTimer;
 
     //Spawns a creature relative to m_creature

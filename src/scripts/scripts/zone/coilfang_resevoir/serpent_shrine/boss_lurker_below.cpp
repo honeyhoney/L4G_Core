@@ -257,6 +257,8 @@ struct boss_the_lurker_belowAI : public BossAI
 
     void EnterCombat(Unit *who)
     {        
+        StartFightTimer();
+
         instance->SetData(DATA_LURKER_EVENT, IN_PROGRESS);
         me->SetReactState(REACT_AGGRESSIVE);        
         AttackStart(who);
@@ -279,8 +281,15 @@ struct boss_the_lurker_belowAI : public BossAI
         AttackStart(pWho);
     }
 
+    void KilledUnit(Unit *victim)
+    {
+        IncrementKillCount();
+    }
+
     void JustDied(Unit* killer)
     {
+        EndFightTimer();
+
         ServerFirst(killer);
 
         instance->SetData(DATA_LURKER_EVENT, DONE);

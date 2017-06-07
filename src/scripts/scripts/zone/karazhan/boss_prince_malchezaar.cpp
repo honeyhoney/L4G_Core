@@ -144,6 +144,8 @@ struct boss_malchezaarAI : public ScriptedAI
 
     void JustDied(Unit *victim)
     {
+        EndFightTimer();
+
         DoScriptText(SAY_DEATH, m_creature);
 
         AxesCleanup();
@@ -164,6 +166,8 @@ struct boss_malchezaarAI : public ScriptedAI
 
     void EnterCombat(Unit *who)
     {
+        StartFightTimer();
+
         DoScriptText(SAY_AGGRO, m_creature);
 
         if(pInstance)

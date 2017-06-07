@@ -161,6 +161,8 @@ struct boss_hydross_the_unstableAI : public ScriptedAI
     }
     void EnterCombat(Unit *who)
     {
+        StartFightTimer();
+
         DoScriptText(SAY_AGGRO, m_creature);
 
         if (pInstance)
@@ -169,6 +171,8 @@ struct boss_hydross_the_unstableAI : public ScriptedAI
 
     void KilledUnit(Unit *victim)
     {
+        IncrementKillCount();
+
         if (CorruptedForm)
             DoScriptText(RAND(SAY_CORRUPT_SLAY1, SAY_CORRUPT_SLAY2), m_creature);
         else
@@ -198,6 +202,8 @@ struct boss_hydross_the_unstableAI : public ScriptedAI
 
     void JustDied(Unit *killer)
     {
+        EndFightTimer();
+
         ServerFirst(killer);
 
         if (CorruptedForm)

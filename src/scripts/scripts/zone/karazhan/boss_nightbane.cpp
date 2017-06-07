@@ -176,6 +176,8 @@ struct boss_nightbaneAI : public ScriptedAI
 
     void EnterCombat(Unit *who)
     {
+        StartFightTimer();
+
         if(pInstance)
             pInstance->SetData(DATA_NIGHTBANE_EVENT, IN_PROGRESS);
 
@@ -191,6 +193,8 @@ struct boss_nightbaneAI : public ScriptedAI
 
     void JustDied(Unit* killer)
     {
+        EndFightTimer();
+
         if(pInstance)
             pInstance->SetData(DATA_NIGHTBANE_EVENT, DONE);
 
